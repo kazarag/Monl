@@ -1,0 +1,83 @@
+/* Center the login form and make the layout more attractive */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f4f4f9;
+  color: #000;
+}
+
+h2 {
+  margin-bottom: 20px;
+  color: #1c2a47;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 400px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.input-field {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 95%;
+}
+
+.input-field:focus {
+  border-color: #f58220;
+  outline: none;
+}
+
+.login-button {
+  padding: 10px;
+  background-color: #f58220;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+  background-color: #e26c0f;
+}
+
+.login-links {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.forgot-password,
+.signup-link {
+  color: #1c2a47;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.forgot-password:hover,
+.signup-link:hover {
+  color: #f58220;
+}
+
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.signup-container .success-message {
+  color: green;
+  text-align: center;
+}

@@ -1,0 +1,43 @@
+  .container {
+    color: black;
+    background-color: white;
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .category-table tr {
+    display: flex;
+    align-items: center;
+    min-height: 20px;
+  }
+
+  .category-table {
+    flex: 1;
+    margin-right: 10px;
+    border-collapse: collapse;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .category-table td,
+  .movie-table td {
+    min-height: 50px;
+    flex: 1;
+  }
+
+  .category-table {
+    flex: 1;
+    margin-right: 10px;
+
+    border-collapse: collapse;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .category-table th {
+    flex: 1;
+  }

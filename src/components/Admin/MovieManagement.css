@@ -1,0 +1,211 @@
+/* MovieManagement.css */
+
+/* Container chính */
+.movie-management {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Tiêu đề */
+  .movie-management h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #000000;
+  }
+  
+  /* Form quản lý phim */
+  .movie-management form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+  
+  /* Input và Textarea trong form */
+  .movie-management input,
+  .movie-management textarea {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  .movie-management h3{
+    color:#333;
+  }
+  /* Nút Thêm/Cập nhật phim */
+  .movie-management button[type="submit"] {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+  
+  .movie-management button[type="submit"]:hover {
+    background-color: #0056b3;
+
+  }
+  
+  /* Nút Thêm tập mới */
+  .movie-management button[type="button"] {
+    padding: 8px 15px;
+    font-size: 14px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+  
+  .movie-management button[type="button"]:hover {
+    background-color: #218838;
+  }
+  
+  /* Container cho cả hai bảng */
+  .tables-container {
+    display: flex;
+    justify-content: space-between; /* Căn đều hai bảng */
+    margin-top: 20px;
+  }
+  
+  /* Bảng thể loại */
+  .category-table, .movie-table {
+    flex: 1; 
+    margin-right: 10px; 
+    border-collapse: collapse; 
+    display: flex; 
+    flex-direction: column; 
+  }
+  
+  /* Xóa khoảng cách ở bảng cuối cùng */
+  .movie-table {
+    margin-right: 0; /* Bảng cuối cùng không cần margin bên phải */
+  }
+  
+  /* Các kiểu dáng bảng đã có */
+  .movie-management table {
+    width: 100%; /* Chiếm toàn bộ chiều rộng của container */
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    color: #000000;
+  }
+  
+  /* Các tiêu đề bảng */
+  .movie-management th,
+  .movie-management td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    min-height: 30px; 
+    width: 100%;
+  }
+  
+  /* Đặt chiều cao tối thiểu cho các hàng để chúng bằng nhau */
+  .category-table tr, .movie-table tr {
+    display: flex; 
+    align-items: center; 
+    min-height: 20px;
+  }
+  
+
+  .category-table td, .movie-table td {
+    min-height: 50px; 
+    flex: 1; 
+  }
+  
+  
+  /* Các nút Chỉnh sửa và Xóa */
+  .movie-management td button {
+    padding: 6px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+  
+  /* Nút Chỉnh sửa */
+  .movie-management td button:first-child {
+    background-color: #ffc107;
+    color: white;
+  }
+  
+  .movie-management td button:first-child:hover {
+    background-color: #e0a800;
+  }
+  
+  /* Nút Xóa */
+  .movie-management td button:last-child {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .movie-management td button:last-child:hover {
+    background-color: #c82333;
+  }
+  
+  /* Tập phim */
+  .episode {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  /* Styling the title */
+.categories-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+/* Styling the categories list container */
+.categories-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Styling each category label */
+.category-item {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  color: #555;
+}
+
+/* Styling the checkbox input */
+.category-checkbox {
+  margin-right: 10px;
+  width: 20px;
+  height: 20px;
+  accent-color: #f58220; /* Change the color of the checkbox */
+}
+
+/* Styling the category name */
+.category-name {
+  margin-left: 5px;
+  color: #444;
+}
+
+/* Optional: Add hover effect on category item */
+.category-item:hover {
+  cursor: pointer;
+  background-color: #f7f7f7;
+  padding: 5px;
+  border-radius: 5px;
+}

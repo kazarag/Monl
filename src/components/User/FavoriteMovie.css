@@ -1,0 +1,43 @@
+
+/* FavoriteMovie.css */
+.favorite-movies {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+  background-color: #181818;
+
+}
+.favorite-movies2{
+  height: 500px;
+}
+.favorite-movies h2 {
+  text-align: center;
+  color: #fff;
+}
+
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.movie-card {
+  background-color: #2c2c2c;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  padding: 15px;
+}
+
+.movie-card img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.movie-card h3 {
+  color: #fff;
+  font-size: 18px;
+  margin-top: 10px;
+}

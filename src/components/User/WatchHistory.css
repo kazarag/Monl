@@ -1,0 +1,64 @@
+.watch-history {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    
+  }
+  .watch-history2{
+    height: 509px;
+  }
+  .watch-history h1 {
+    text-align: center;
+    color: #333;
+  }
+  
+  .history-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .history-item {
+    padding: 15px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .history-item:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .history-item .movie-title {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .history-item .episode-name {
+    color: #666;
+  }
+  
+  .history-item .watch-timestamp {
+    font-size: 14px;
+    color: #888;
+  }
+  .history-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .delete-button {
+    padding: 5px 10px;
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .delete-button:hover {
+    background-color: #ff7875;
+  }
+  

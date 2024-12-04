@@ -1,0 +1,57 @@
+.user-management{
+  color:black;
+  background-color: white;
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+.user-management table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  
+}
+
+.user-management th, .user-management td {
+  border: 1px solid #f58220;
+  padding: 8px;
+  text-align: left;
+}
+
+.user-management th {
+  background-color: #f58220;
+}
+
+/* .user-management tr:nth-child(even) {
+  background-color: #f9f9f9;
+} */
+
+.user-management tr:hover {
+  background-color: #f60e0b;
+}
+
+.user-management button {
+  margin-right: 5px;
+  padding: 5px 10px;
+  background-color: #b1a0f6;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.user-management button:hover {
+  background-color: #ff7875;
+}
+
+.user-management button:nth-child(2) {
+  background-color: #1890ff;
+}
+
+.user-management button:nth-child(2):hover {
+  background-color: #40a9ff;
+}

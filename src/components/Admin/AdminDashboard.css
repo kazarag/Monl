@@ -1,0 +1,138 @@
+/* General layout */
+.admin-dashboard {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 500px;
+}
+.dashboard-actions h2 {
+  
+  margin-bottom: 30px;
+  color: #ffffff;
+}
+.movies-table h2{
+  color: #ffffff;
+}
+.dashboard-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  background-color: #f58220;
+  padding: 20px;
+  border-radius: 8px;
+  color: #fff;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 45%;
+}
+
+.stat-card h3 {
+  font-size: 1.2em;
+  margin-bottom: 10px;
+}
+
+.stat-card p {
+  font-size: 2em;
+  font-weight: bold;
+}
+
+.dashboard-actions {
+  margin-bottom: 30px;
+}
+
+.admin-links {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.admin-links li {
+  list-style: none;
+}
+
+.admin-links a {
+  text-decoration: none;
+  background-color: #1c2a47;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.admin-links a:hover {
+  background-color: #f58220;
+}
+
+/* Movies table */
+.movies-table {
+  margin-top: 30px;
+}
+
+.movies-table h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #1c2a47;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+table th, table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+table th {
+  background-color: #f58220;
+  color: white;
+}
+
+.edit-btn, .delete-btn {
+  padding: 5px 10px;
+  margin-right: 5px;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+}
+
+.edit-btn {
+  background-color: #1c2a47;
+}
+
+.delete-btn {
+  background-color: #e74c3c;
+}
+
+.edit-btn:hover {
+  background-color: #f58220;
+}
+
+.delete-btn:hover {
+  background-color: #c0392b;
+}
+
+@media screen and (max-width: 768px) {
+  .dashboard-stats {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .stat-card {
+    width: 80%;
+    margin-bottom: 20px;
+  }
+
+  table th, table td {
+    font-size: 14px;
+    padding: 8px;
+  }
+}

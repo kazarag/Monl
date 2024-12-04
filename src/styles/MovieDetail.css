@@ -1,0 +1,186 @@
+/* General movie detail container */
+.movie-detail {
+  padding: 20px;
+  width: 1200px; 
+  margin: auto;
+  font-family: Arial, sans-serif;
+  background-color: #1c2a47;
+  color: white;
+  height: 500px;
+}
+
+/* Header with movie information */
+.movie-header {
+  display: flex;
+  margin-bottom: 20px;
+  /* border-bottom: 2px solid #3c4a63; */
+  
+  padding-bottom: 20px;
+  
+}
+
+.movie-poster {
+  max-width: 250px;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-right: 20px;
+}
+
+.movie-info {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.movie-info h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #ffe600;
+}
+
+.movie-info p {
+  margin: 5px 0;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.movie-info .status,
+.movie-info .category,
+.movie-info .year,
+.movie-info .cast {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.movie-info .highlight {
+  font-weight: bold;
+  color: #00b3ff;
+}
+
+/* Watch and download buttons */
+.watch-movie-button,
+.download-button {
+  display: inline-block;
+  padding: 10px 20px;
+  margin-top: 15px;
+  background-color: #f58220;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  text-transform: uppercase;
+  margin-right: 10px;
+}
+
+.watch-movie-button:hover,
+.download-button:hover {
+  background-color: #d4731c;
+}
+
+/* Episode List styling */
+.movie-episodes {
+  margin-top: 30px;
+}
+
+.movie-episodes h2 {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #ffe600;
+}
+
+.movie-episodes .episode-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.movie-episodes .episode-item {
+  margin: 5px;
+  background-color: #243554;
+  padding: 10px;
+  border-radius: 5px;
+  width: 100px;
+  text-align: center;
+}
+
+.movie-episodes .episode-item a {
+  color: #00b3ff;
+  text-decoration: none;
+}
+
+.movie-episodes .episode-item a:hover {
+  color: #ffe600;
+}
+
+/* Server Sources */
+.server-source {
+  margin-top: 30px;
+}
+
+.server-source h3 {
+  font-size: 18px;
+  color: #ffe600;
+}
+
+.server-source .source-list {
+  background-color: #243554;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.server-source pre {
+  background-color: #18233a;
+  color: #00b3ff;
+  padding: 10px;
+  border-radius: 5px;
+  overflow-x: auto;
+  font-size: 14px;
+}
+
+.server-source pre a {
+  color: #00b3ff;
+  text-decoration: none;
+}
+
+.server-source pre a:hover {
+  color: #ffe600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .movie-header {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .movie-poster {
+    margin: 0 0 20px 0;
+    max-width: 100%;
+  }
+
+  .watch-movie-button,
+  .download-button {
+    width: 100%;
+    text-align: center;
+    margin: 10px 0;
+  }
+
+  .movie-episodes .episode-item {
+    width: 80px;
+  }
+}
+.favorite-button {
+  margin-top: 10px;
+  padding: 8px 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #f9f9f9;
+  color: #dc3545;
+  transition: background-color 0.3s ease;
+}
+
+.favorite-button:hover {
+  background-color: #f1f1f1;
+}
