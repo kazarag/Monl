@@ -165,6 +165,7 @@ body.dark-mode .toggle-icon {
     position: absolute;
     top: 50px;
     right: 0; 
+    width: auto;
     min-width: 150px; 
     background: #2c2c2c;
     border-radius: 5px;

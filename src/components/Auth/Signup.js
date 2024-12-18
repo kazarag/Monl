@@ -55,6 +55,7 @@ const Signup = () => {
       });
 
       navigate("/");
+      window.location.reload();
     } catch (error) {
       console.error("Lỗi đăng ký người dùng:", error);
       setError("Đã có lỗi xảy ra khi đăng ký!");

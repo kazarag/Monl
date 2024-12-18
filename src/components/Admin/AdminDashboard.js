@@ -1,29 +1,28 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { db } from '../../firebase/firebase';
-import './AdminDashboard.css';
-import { collection, getDocs } from 'firebase/firestore';
+import React, { useState, useEffect, useContext } from "react";
+import { db } from "../../firebase/firebase";
+import "./AdminDashboard.css";
+import { collection, getDocs, writeBatch, doc } from "firebase/firestore";
 import { AuthContext } from "../../contexts/AuthContext";
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
   const [totalMovies, setTotalMovies] = useState(0);
   const [totalUsers, setTotalUsers] = useState(0);
   const [movies, setMovies] = useState([]);
   const { user, loading } = useContext(AuthContext);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   useEffect(() => {
-
-    if (loading) return; 
+    if (loading) return;
     // if (!user || user.role !== 'admin') {
-    //   navigate('/'); 
+    //   navigate('/');
     // }
-    
+
     const fetchData = async () => {
       try {
         // Fetch movies collection
-        const moviesSnapshot = await getDocs(collection(db, 'movies'));
-        const moviesList = moviesSnapshot.docs.map(doc => ({
+        const moviesSnapshot = await getDocs(collection(db, "movies"));
+        const moviesList = moviesSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
@@ -31,15 +30,38 @@ const AdminDashboard = () => {
         setTotalMovies(moviesSnapshot.docs.length); // Count the total movies
 
         // Fetch users collection
-        const usersSnapshot = await getDocs(collection(db, 'user'));
+        const usersSnapshot = await getDocs(collection(db, "user"));
         setTotalUsers(usersSnapshot.docs.length); // Count the total users
       } catch (error) {
-        console.error('Lỗi khi tải danh sách:', error);
+        console.error("Lỗi khi tải danh sách:", error);
       }
     };
 
     fetchData();
   }, [user, loading, navigate]); // Add user, loading, and navigate as dependencies
+  const handleDeleteCollection = async (collectionName) => {
+    const confirmed = window.confirm(
+      `Bạn có chắc chắn muốn xóa toàn bộ bảng ${collectionName}? Hành động này không thể hoàn tác.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const batch = writeBatch(db); // Khởi tạo batch
+      const querySnapshot = await getDocs(collection(db, collectionName));
+
+      querySnapshot.forEach((docItem) => {
+        const docRef = doc(db, collectionName, docItem.id); // Tham chiếu đến tài liệu
+        batch.delete(docRef); // Thêm thao tác xóa vào batch
+      });
+
+      await batch.commit(); // Gửi batch để thực thi
+      alert(`Đã xóa toàn bộ bảng ${collectionName} thành công!`);
+    } catch (error) {
+      console.error(`Lỗi khi xóa bảng ${collectionName}:`, error);
+      alert(`Có lỗi xảy ra khi xóa bảng ${collectionName}: ${error.message}`);
+    }
+  };
 
   return (
     <div className="admin-dashboard">
@@ -56,38 +78,28 @@ const AdminDashboard = () => {
           <p>{totalUsers}</p>
         </div>
       </div>
-
-      {/* Actions Section */}
-      {/* <div className="dashboard-actions">
-        <h2>Quản lý</h2>
-        <ul className="admin-links">
-          <li><a href="/admin/movies">Quản lý Phim</a></li>
-          <li><a href="/admin/users">Quản lý Người dùng</a></li>
-        </ul>
+      {/* <div className="admin-tools">
+        <h1>Công cụ quản trị</h1>
+        <button onClick={() => handleDeleteCollection("watchHistory")}>
+          Xóa toàn bộ Watch History
+        </button>
+        <button onClick={() => handleDeleteCollection("users")}>
+          Xóa toàn bộ dữ liệu Users
+        </button>
+        <button onClick={() => handleDeleteCollection("ratings")}>
+          Xóa toàn bộ Ratings
+        </button>
+        <button onClick={() => handleDeleteCollection("movies")}>
+          Xóa toàn bộ Movies
+        </button>
+        <button onClick={() => handleDeleteCollection("comments")}>
+          Xóa toàn bộ Comments
+        </button>
+        <button onClick={() => handleDeleteCollection("categories")}>
+          Xóa toàn bộ Categories
+        </button>
       </div> */}
 
-      {/* Movies Table
-      <div className="movies-table">
-        <h2>Danh sách phim</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Tên phim</th>
-              <th>Thể loại</th>
-              <th>Năm sản xuất</th>
-            </tr>
-          </thead>
-          <tbody>
-            {movies.map(movie => (
-              <tr key={movie.id}>
-                <td>{movie.name}</td>
-                <td>{movie.category ? movie.category.map(cat => cat.name).join(', ') : 'N/A'}</td>
-                <td>{movie.year}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div> */}
     </div>
   );
 };

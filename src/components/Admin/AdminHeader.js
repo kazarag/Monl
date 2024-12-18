@@ -39,7 +39,7 @@ const AdminHeader = () => {
             <a href="/admin/users">Quản lý Người dùng</a>
           </li>
           {/* <li>
-            <a href="/admin/stats">Thống kê</a>
+            <a href="/admin/comment">Quản lý bình luận</a>
           </li> */}
         </ul>
       </div>

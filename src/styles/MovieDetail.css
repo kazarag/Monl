@@ -184,3 +184,21 @@
 .favorite-button:hover {
   background-color: #f1f1f1;
 }
+.episode-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.episode-list li {
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.episode-list li:hover {
+  background-color: #007bff; 
+}
+
+.episode-list li.active {
+  background-color: #007bff;  
+}

@@ -14,7 +14,6 @@ const UserProfile = () => {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Fetch thông tin người dùng từ Firebase Auth và Firestore
   useEffect(() => {
     const fetchUserData = async () => {
       const currentUser = auth.currentUser;
@@ -37,7 +36,7 @@ const UserProfile = () => {
     fetchUserData();
   }, []);
 
-  // Cập nhật thông tin cá nhân trong Firestore và Auth
+
   const handleUpdateProfile = async () => {
     try {
       const currentUser = auth.currentUser;
@@ -95,6 +94,7 @@ const UserProfile = () => {
               <label>Email:</label>
               <input
                 type="email"
+                placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -104,6 +104,7 @@ const UserProfile = () => {
               <label>Họ và tên:</label>
               <input
                 type="text"
+                placeholder="Họ và tên"
                 value={fullname}
                 onChange={(e) => setFullname(e.target.value)}
               />
@@ -113,6 +114,7 @@ const UserProfile = () => {
               <label>Số điện thoại:</label>
               <input
                 type="text"
+                placeholder="Số điện thoại"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
               />
@@ -126,12 +128,14 @@ const UserProfile = () => {
                 <label>Mật khẩu mới:</label>
                 <input
                   type="password"
+                  placeholder="Mật khẩu mới"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                 />
                 <label>Xác nhận mật khẩu mới:</label>
                 <input
                   type="password"
+                  placeholder="Xác nhận mật khẩu mới"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required

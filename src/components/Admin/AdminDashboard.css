@@ -3,7 +3,7 @@
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
-  height: 500px;
+  height: 550px;
 }
 .dashboard-actions h2 {
   
@@ -135,4 +135,21 @@ table th {
     font-size: 14px;
     padding: 8px;
   }
+}
+.admin-tools {
+  margin-top: 20px;
+}
+
+.admin-tools button {
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.admin-tools button:hover {
+  background-color: #c9302c;
 }

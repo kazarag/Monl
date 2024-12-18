@@ -86,6 +86,57 @@
 .controls button:hover:not(:disabled) {
   background-color: #0056b3;
 }
+.review-input textarea {
+  width: 100%;
+  min-height: 100px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  font-size: 16px;
+  resize: none;
+  margin-bottom: 10px;
+}
+.review-input textarea:focus {
+  outline: none;
+  border-color: #ffa500;
+}
+/* Nút viết đánh giá */
+.write-review-button {
+  background-color: #160c3a;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.write-review-button:hover {
+  background-color: #ffa500;
+}
+
+
+.reviews-list {
+  margin-top: 20px;
+}
+
+.review-item {
+  background-color: #222;
+  color: #fff;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+.review-item p {
+  margin: 0;
+}
+
+.review-item small {
+  color: #ccc;
+}
+.review-section h3{
+  color: #fff;
+}
 .rating-container button {
   background-color: #160c3a;
   border: none;
@@ -107,6 +158,21 @@
   background-color: #ffa500; 
   color: #000; 
   font-weight: bold; 
+}
+.submit-review-button {
+  background-color: #ffa500;
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.submit-review-button:hover {
+  background-color: #ff7f00;
+  color: #fff;
 }
 
 .comment-header {

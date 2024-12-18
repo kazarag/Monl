@@ -30,7 +30,7 @@ const FavoriteMovie = () => {
   }
   return (
     <div className="favorite-movies">
-      <h2>Danh sách phim yêu thích</h2>
+      {/* <h2>Danh sách phim yêu thích</h2> */}
       <div className="movies-grid">
         {favoriteMovies.map((movie) => (
           <Link to={`/movies/${movie.id}`} key={movie.id} className="movie-card"> {/* Link tới MovieDetail */}

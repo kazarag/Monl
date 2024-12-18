@@ -10,7 +10,6 @@ const MovieDetail = () => {
   const { user } = useContext(AuthContext);
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [Episode, setEpisode] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const navigate = useNavigate();
 
@@ -31,22 +30,6 @@ const MovieDetail = () => {
       }
     };
 
-    const fetchNextEpisode = async () => {
-      if (user && movie) {
-        try {
-          const historyDocRef = doc(db, 'watchHistory', user.uid, 'movies', movieId);
-          const historyDoc = await getDoc(historyDocRef);
-
-          if (historyDoc.exists()) {
-            setEpisode(historyDoc.data().Episode || movie.episodes[0]);
-          } else {
-            setEpisode(movie.episodes[0]);
-          }
-        } catch (error) {
-          console.error('Lỗi khi tải tập phim tiếp theo:', error);
-        }
-      }
-    };
 
     const checkFavorite = async () => {
       if (user) {
@@ -58,7 +41,6 @@ const MovieDetail = () => {
 
     const initializeData = async () => {
       await fetchMovieDetails();
-      fetchNextEpisode();
       checkFavorite();
     };
 
@@ -66,7 +48,7 @@ const MovieDetail = () => {
   }, [movieId, user, movie]);
 
   const handleWatchMovie = () => {
-    navigate(`/movies/${movieId}/watch`, { state: { episode: Episode || movie.episodes[0] } });
+    navigate(`/movies/${movieId}/watch`, { state: { episode: movie.episodes[0] } });
   };
 
   const handleFavoriteToggle = async () => {
@@ -116,7 +98,7 @@ const MovieDetail = () => {
           <p>Chất lượng: {movie.quality}</p>
           <p>Ngôn ngữ: {movie.lang}</p>
           {movie.rating && movie.rating>0?(
-          <p>Đánh giá: {parseFloat((movie.rating).toFixed(2))}⭐ </p>):(
+          <p>Đánh giá: {(movie.rating)}⭐ </p>):(
             <p>Đánh giá: Chưa có đánh giá</p>
           )}
           <button onClick={handleWatchMovie} className="watch-movie-button">Xem phim</button>

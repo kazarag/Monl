@@ -19,78 +19,107 @@ const MovieList = () => {
   const handleScroll = (direction) => {
     const slider = sliderRef.current;
     const scrollAmount = slider.offsetWidth / 2;
-
+  
     if (direction === "prev") {
-      slider.scrollLeft -= scrollAmount;
+      if (slider.scrollLeft <= 0) {
+
+        // slider.scrollLeft = slider.scrollWidth;
+      } else {
+        slider.scrollLeft -= scrollAmount;
+      }
     } else if (direction === "next") {
-      slider.scrollLeft += scrollAmount;
+      if (slider.scrollLeft + slider.offsetWidth >= slider.scrollWidth) {
+        slider.scrollLeft = 0;
+      } else {
+        slider.scrollLeft += scrollAmount;
+      }
     }
   };
+  
   const getRandomMovies = (movies, count) => {
-    const shuffledMovies = [...movies];
-
-    for (let i = shuffledMovies.length - 1; i > 0; i--) {
-      const randomIndex = Math.floor(Math.random() * (i + 1));
-      [shuffledMovies[i], shuffledMovies[randomIndex]] = [
-        shuffledMovies[randomIndex],
-        shuffledMovies[i],
-      ];
+    if (!Array.isArray(movies) || movies.length === 0) {
+      console.error("Movies array is invalid or empty.");
+      return [];
     }
-
-    return shuffledMovies.slice(0, count);
+  
+    // Nếu số lượng phim yêu cầu lớn hơn số lượng phim trong mảng, lấy tất cả
+    count = Math.min(count, movies.length);
+  
+    const randomMovies = [];
+    const movieIndexes = new Set(); // Để tránh chọn trùng
+  
+    while (randomMovies.length < count) {
+      const randomIndex = Math.floor(Math.random() * movies.length);
+      if (!movieIndexes.has(randomIndex)) {
+        randomMovies.push(movies[randomIndex]);
+        movieIndexes.add(randomIndex);
+      }
+    }
+  
+    return randomMovies;
   };
+  
   useEffect(() => {
-    const fetchMovies = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "movies"));
-        const moviesList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        setMovies(moviesList);
-      } catch (error) {
-        console.error("Lỗi khi tải danh sách phim:", error);
-      }
-    };
-
-    const fetchCategories = async () => {
-      try {
-        const categorySnapshot = await getDocs(collection(db, "categories"));
-        const categoriesList = categorySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        setCategories(categoriesList);
-      } catch (error) {
-        console.error("Lỗi khi tải danh sách thể loại:", error);
-      }
-    };
-
+    if (movies.length === 0 &&searchTerm.trim() === "") {
+      const fetchMovies = async () => {
+        try {
+          const querySnapshot = await getDocs(collection(db, "movies"));
+          const moviesList = querySnapshot.docs
+            .map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }))
+            .sort((a, b) => {
+              const dateA = new Date(a.day_modified || a.day_added).getTime();
+              const dateB = new Date(b.day_modified || b.day_added).getTime();
+              return dateB - dateA;
+            });
+      
+          setMovies(moviesList);
+        } catch (error) {
+          console.error("Lỗi khi tải danh sách phim:", error);
+        }
+      };
+      
+  
+      const fetchCategories = async () => {
+        try {
+          const categorySnapshot = await getDocs(collection(db, "categories"));
+          const categoriesList = categorySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setCategories(categoriesList);
+        } catch (error) {
+          console.error("Lỗi khi tải danh sách thể loại:", error);
+        }
+      };
+  
+      const initializeData = async () => {
+        await Promise.all([fetchMovies(), fetchCategories()]);
+        setLoading(false);
+      };
+  
+      initializeData();
+    }
+  
+  }, [movies]); 
+  
+  useEffect(() => {
     const fetchRecommendations = async () => {
       try {
         if (user) {
           const favoritesRef = collection(db, "users", user.uid, "favorites");
-          const watchHistoryRef = collection(
-            db,
-            "watchHistory",
-            user.uid,
-            "movies"
-          );
-
+          const watchHistoryRef = collection(db, "watchHistory", user.uid, "movies");
+  
           const [favoritesSnapshot, watchHistorySnapshot] = await Promise.all([
             getDocs(favoritesRef),
             getDocs(watchHistoryRef),
           ]);
-
-          const favoriteMovies = favoritesSnapshot.docs.map((doc) =>
-            doc.data()
-          );
-          const watchedMovies = watchHistorySnapshot.docs.map((doc) =>
-            doc.data()
-          );
-
+  
+          const favoriteMovies = favoritesSnapshot.docs.map((doc) => doc.data());
+          const watchedMovies = watchHistorySnapshot.docs.map((doc) => doc.data());
+  
           const relevantCategories = new Set([
             ...favoriteMovies.flatMap((movie) =>
               movie.category.map((cat) => cat.slug)
@@ -99,32 +128,24 @@ const MovieList = () => {
               movie.category.map((cat) => cat.slug)
             ),
           ]);
-
+  
           const recommended = movies.filter((movie) =>
             movie.category.some((cat) => relevantCategories.has(cat.slug))
           );
-          const random = getRandomMovies(recommended, 10);
-          setRecommendedMovies(recommended.slice(0, 10));
+          setRecommendedMovies(getRandomMovies(recommended, 15)); // Set ngẫu nhiên các bộ phim
         } else {
-          const RecomMovies = getRandomMovies(
-            movies.filter((movie) => movie.rating),
-            10
-          );
+          const RecomMovies = getRandomMovies(movies, 15);
           setRecommendedMovies(RecomMovies);
         }
       } catch (error) {
         console.error("Lỗi khi tải danh sách gợi ý:", error);
       }
     };
-
-    const initializeData = async () => {
-      await Promise.all([fetchMovies(), fetchCategories()]);
-      fetchRecommendations();
-      setLoading(false);
-    };
-
-    initializeData();
-  }, [user, movies]);
+  
+    fetchRecommendations();
+  }, [user, movies]); 
+  
+  
 
   const filteredMovies = movies.filter(
     (movie) =>
@@ -200,7 +221,7 @@ const MovieList = () => {
       ) : (
         <h3 />
       )}
-      <p></p>
+      <p> </p>
       {/* Search and Filter */}
       <div className="search-filter">
         <input
@@ -284,14 +305,14 @@ const MovieList = () => {
                 setCurrentPage(value);
               }
             }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                const value = parseInt(e.target.value, 10);
-                if (!isNaN(value) && value >= 1 && value <= totalPages) {
-                  setCurrentPage(value);
-                }
-              }
-            }}
+            // onKeyDown={(e) => {
+            //   if (e.key === "Enter") {
+            //     const value = parseInt(e.target.value, 10);
+            //     if (!isNaN(value) && value >= 1 && value <= totalPages) {
+            //       setCurrentPage(value);
+            //     }
+            //   }
+            // }}
             className="page-input"
           />
           / {totalPages}

@@ -125,11 +125,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-decoration: none;
 }
 
 .movie-info p {
   font-size: 14px;
   color: #aaa;
+  text-decoration: none;
 }
 /* Wrapper cho Slider */
 .slider-container {
@@ -137,28 +139,32 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  overflow: hidden; 
+  overflow: hidden;
   width: 100%;
 }
 
-
 .slider-wrapper {
   display: flex;
-  transition: transform 0.3s ease-in-out; 
+  transition: transform 0.3s ease-in-out;
   overflow: hidden;
 }
 
-
 .slider {
   display: flex;
-  transition: scroll-behavior 0.3s ease; 
-  overflow-x: auto; 
+  overflow-x: auto;
   scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch; 
+  scrollbar-width: none; 
+  -ms-overflow-style: none; 
+}
+
+.slider::-webkit-scrollbar {
+  display: none; 
 }
 
 .slider .movie-item {
-  flex: 0 0 auto; 
-  margin: 0 10px; 
+  flex: 0 0 auto;
+  margin: 0 10px;
 }
 
 .movie-poster {
@@ -192,3 +198,10 @@
   background-color: #f58220;
 }
 
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}

@@ -24,11 +24,12 @@ const WatchMovie = () => {
     location.state?.episode || {}
   );
   const [movie, setMovie] = useState(null);
-  // const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState("");
   const [user, setUser] = useState(null);
-  // const [visibleComments, setVisibleComments] = useState(10);
   const [selectedRating, setSelectedRating] = useState(0);
+  const [reviewContent, setReviewContent] = useState("");
+  const [showReviewForm, setShowReviewForm] = useState(false); // Quản lý hiện/ẩn form đánh giá
+  const [reviews, setReviews] = useState([]); // Danh sách đánh giá
+
   // Fetch thông tin phim
   useEffect(() => {
     const fetchMovie = async () => {
@@ -41,52 +42,115 @@ const WatchMovie = () => {
     };
     fetchMovie();
   }, [movieId]);
-  // useEffect(() => {
-  //   alert("movieId from URL:", movieId);
-  // }, [movieId]);
+  useEffect(() => {
+    if (movie && !currentEpisode && movie.episodes.length > 0) {
+      setCurrentEpisode(movie.episodes[0]);
+    }
+  }, [movie, currentEpisode]);
   useEffect(() => {
     const fetchUserRating = async () => {
       if (user) {
         const ratingsRef = collection(db, "ratings");
-        const q = query(
+        const usersRef = collection(db, "user"); 
+        let q = query(
           ratingsRef,
           where("userId", "==", user.uid),
           where("movieId", "==", movieId)
         );
-        const querySnapshot = await getDocs(q);
-  
+        let querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
           const userRating = querySnapshot.docs[0].data().rating;
-          setSelectedRating(userRating); // Gán điểm người dùng đã chấm
+          const userReview = querySnapshot.docs[0].data().reviewContent;
+          setSelectedRating(userRating);
+          setReviewContent(userReview);
         }
+  
+        q = query(ratingsRef, where("movieId", "==", movieId));
+        querySnapshot = await getDocs(q);
+  
+        const reviewsData = await Promise.all(
+          querySnapshot.docs.map(async (reviewDoc) => {
+            const review = reviewDoc.data();
+            try {
+              const userDocRef = doc(usersRef, review.userId);
+              const userDoc = await getDoc(userDocRef);
+              const userName = userDoc.exists()
+                ? userDoc.data().fullname
+                : "Người dùng ẩn danh";
+  
+              return {
+                id: reviewDoc.id,
+                ...review,
+                userName,
+              };
+            } catch (error) {
+              console.error(`Lỗi khi lấy tên người dùng: ${error.message}`);
+              return {
+                id: reviewDoc.id,
+                ...review,
+                userName: "Người dùng ẩn danh",
+              };
+            }
+          })
+        );
+        setReviews(reviewsData);
       }
     };
     fetchUserRating();
   }, [user, movieId]);
-    // // Fetch bình luận
-    // useEffect(() => {
-    //   const commentsRef = collection(db, "comments");
-    //   const q = query(
-    //     commentsRef,
-    //     where("movieId", "==", movieId),
-    //     orderBy("timestamp", "desc")
-    //   );
+  
+  useEffect(() => {
+    const saveHistory = async () => {
+      if (!user || !currentEpisode || !movie) return; // Kiểm tra điều kiện để lưu lịch sử
+      try {
+        const watchHistoryRef = collection(db, "watchHistory");
+        const q = query(
+          watchHistoryRef,
+          where("userId", "==", user.uid),
+          where("movieId", "==", movieId)
+        );
 
-    //   const unsubscribe = onSnapshot(q, (snapshot) => {
-    //     if (snapshot.empty) {
-    //       alert("No matching documents.");
-    //     } else {
-    //       const commentsData = snapshot.docs.map((doc) => ({
-    //         id: doc.id,
-    //         ...doc.data(),
-    //       }));
-    //       alert("Comments fetched: ", commentsData);
-    //       setComments(commentsData);
-    //     }
-    //   });
+        const querySnapshot = await getDocs(q);
 
-    //   return () => unsubscribe();
-    // }, [movieId]);
+        if (!querySnapshot.empty) {
+          const docId = querySnapshot.docs[0].id;
+          const docRef = doc(db, "watchHistory", docId);
+          await updateDoc(docRef, {
+            episode: {
+              name: currentEpisode.name,
+              link_m3u8: currentEpisode.link_m3u8,
+            },
+            timestamp: new Date(), // Cập nhật lại thời gian
+          });
+        } else {
+          // Nếu chưa có lịch sử, tạo mới
+          await addDoc(watchHistoryRef, {
+            userId: user.uid,
+            movieId,
+            movieTitle: movie.name || "Unknown",
+            episode: {
+              name: currentEpisode.name,
+              link_m3u8: currentEpisode.link_m3u8,
+            },
+            timestamp: new Date(),
+          });
+        }
+        // alert("Lịch sử đã được lưu!");
+      } catch (error) {
+        console.error("Error saving watch history:", error);
+      }
+    };
+
+    if (user) {
+      saveHistory();
+    }
+  }, [currentEpisode, user, movie, movieId]);
+  const handleSelectEpisode = (episode, movieId, user) => {
+    setCurrentEpisode(episode);
+    if (user) {
+      saveWatchHistory(episode, movieId, user);
+    }
+  };
 
   useEffect(() => {
     const fetchWatchHistory = async (userId) => {
@@ -116,65 +180,21 @@ const WatchMovie = () => {
     return () => unsubscribeAuth();
   }, [movieId]);
 
-  // const handleAddComment = async () => {
-  //   if (!newComment.trim()) {
-  //     alert("Bình luận không được để trống!");
-  //     return;
-  //   }
-
-  //   if (!user) {
-  //     alert("Vui lòng đăng nhập để bình luận!");
-  //     return;
-  //   }
-
-  //   try {
-  //     const commentsRef = collection(db, "comments");
-  //     await addDoc(commentsRef, {
-  //       movieId,
-  //       userId: user?.uid,
-  //       username: user?.displayName || user?.email || "Anonymous",
-  //       comment: newComment,
-  //       reaction: "", // Mặc định không có cảm xúc
-  //       timestamp: new Date(),
-  //     });
-
-  //     setNewComment("");
-  //     alert("Bình luận đã được thêm!");
-  //   } catch (error) {
-  //     console.error("Lỗi khi thêm bình luận:", error);
-  //   }
-  // };
-  // const handleDeleteComment = async (commentId) => {
-  //   try {
-  //     const commentRef = doc(db, "comments", commentId);
-  //     await deleteDoc(commentRef);
-  //   } catch (error) {
-  //     console.error("Error deleting comment:", error);
-  //   }
-  // };
-  // const handleUpdateReaction = async (commentId, newReaction) => {
-  //   try {
-  //     const commentRef = doc(db, "comments", commentId);
-  //     await updateDoc(commentRef, {
-  //       reaction: newReaction,
-  //     });
-  //   } catch (error) {
-  //     console.error("Error updating reaction:", error);
-  //   }
-  // };
-
-  const handleRating = async (selectedRating) => {
+  const handleRating = async (selectedRating, reviewContent) => {
     if (!user) {
       alert("Vui lòng đăng nhập để chấm điểm!");
       return;
     }
 
+    if (!reviewContent.trim() || selectedRating === 0) {
+      alert("Vui lòng nhập nội dung đánh giá và chọn điểm!");
+      return;
+    }
+
     try {
-      setSelectedRating(selectedRating);
       const ratingsRef = collection(db, "ratings");
       const movieDocRef = doc(db, "movies", movieId);
 
-      // Kiểm tra xem người dùng đã chấm điểm chưa
       const q = query(
         ratingsRef,
         where("userId", "==", user.uid),
@@ -193,63 +213,63 @@ const WatchMovie = () => {
       const sumRatings = movieData.sumRatings || 0;
 
       if (!querySnapshot.empty) {
-        // Người dùng đã chấm điểm -> Cập nhật điểm
         const ratingDocRef = querySnapshot.docs[0].ref;
         const oldRating = querySnapshot.docs[0].data().rating;
 
-        const updatedSumRatings = sumRatings - oldRating + selectedRating; // Loại bỏ điểm cũ, thêm điểm mới
+        const updatedSumRatings = sumRatings - oldRating + selectedRating;
         const updatedRating = updatedSumRatings / totalRatings;
 
         await updateDoc(movieDocRef, {
           sumRatings: updatedSumRatings,
-          rating: updatedRating, // Tính lại điểm trung bình
+          rating: updatedRating,
         });
 
         await updateDoc(ratingDocRef, {
           rating: selectedRating,
+          reviewContent,
           timestamp: new Date(),
         });
 
-        alert(`Bạn đã cập nhật điểm thành ${selectedRating} sao!`);
+        alert(`Bạn đã cập nhật đánh giá thành công!`);
       } else {
         const updatedTotalRatings = totalRatings + 1;
         const updatedSumRatings = sumRatings + selectedRating;
-        const updatedRating = parseFloat(updatedSumRatings / updatedTotalRatings).toFixed(2);
+        const updatedRating = parseFloat(
+          updatedSumRatings / updatedTotalRatings
+        ).toFixed(2);
 
         await updateDoc(movieDocRef, {
           totalRatings: updatedTotalRatings,
           sumRatings: updatedSumRatings,
-          rating: updatedRating, 
+          rating: updatedRating,
         });
 
         await addDoc(ratingsRef, {
           userId: user.uid,
           movieId,
           rating: selectedRating,
+          reviewContent,
           timestamp: new Date(),
         });
 
-        alert(`Bạn đã chấm ${selectedRating} sao!`);
+        alert(`Đánh giá của bạn đã được ghi nhận!`);
+        setShowReviewForm(false);
       }
-      const movieDocupload = await getDoc(movieDocRef);
-      if (movieDocupload.exists) {
-        setMovie(movieDocupload.data());
-        // alert("Movie fetched ", movieDoc.data().id);
-      }
-    } catch (error) {
-      console.error("Lỗi khi chấm điểm:", error);
-    }
-  };
 
-  const handleSelectEpisode = (episode, movieId, user) => {
-    setCurrentEpisode(episode);
-    if (user) {
-      saveWatchHistory(episode, movieId, user);
+      const updatedMovieDoc = await getDoc(movieDocRef);
+      if (updatedMovieDoc.exists) {
+        setMovie(updatedMovieDoc.data());
+      }
+
+      setReviewContent("");
+      setSelectedRating(0);
+    } catch (error) {
+      console.error("Lỗi khi xử lý đánh giá:", error);
     }
   };
 
   const saveWatchHistory = async (episode, movieId, user) => {
-    if (!user) return; 
+    if (!user) return;
     const watchHistoryRef = collection(db, "watchHistory");
     const q = query(
       watchHistoryRef,
@@ -257,29 +277,29 @@ const WatchMovie = () => {
       where("movieId", "==", movieId)
     );
     try {
-      const querySnapshot = await getDocs(q); 
+      const querySnapshot = await getDocs(q);
       if (!querySnapshot.empty) {
         // If a record exists, update it
         const docId = querySnapshot.docs[0].id;
         const docRef = doc(db, "watchHistory", docId);
         await updateDoc(docRef, {
-          movieTitle: episode.movieTitle || "Unknown",
+          movieTitle: movie.name || "Unknown",
           episode: {
             name: episode.name,
-            link_m3u8: episode.link_m3u8, 
+            link_m3u8: episode.link_m3u8,
           },
-          timestamp: new Date(), 
+          timestamp: new Date(),
         });
       } else {
         await addDoc(watchHistoryRef, {
           userId: user.uid,
           movieId,
-          movieTitle: movie.name || "Unknown", 
+          movieTitle: movie.name || "Unknown",
           episode: {
             name: episode.name,
             link_m3u8: episode.link_m3u8,
           },
-          timestamp: new Date(), 
+          timestamp: new Date(),
         });
       }
       // alert("Save history success!");
@@ -306,7 +326,7 @@ const WatchMovie = () => {
           title={currentEpisode.name}
           width="100%"
           height="480px"
-          allowFullScreen 
+          allowFullScreen
           onClick={() => saveWatchHistory(currentEpisode, movieId, user)}
         ></iframe>
       </div>
@@ -317,7 +337,7 @@ const WatchMovie = () => {
           {movie.episodes.map((episode, index) => (
             <li
               key={index}
-              className={episode === currentEpisode ? "active" : ""}
+              className={episode.name === currentEpisode.name ? "active" : ""}
               onClick={() => handleSelectEpisode(episode, movieId, user)}
             >
               {episode.name}
@@ -327,88 +347,75 @@ const WatchMovie = () => {
       </div>
 
       <div className="movie-actions">
-        {/* Chấm điểm */}
+        {/* Hiển thị điểm đánh giá */}
         <div className="movie-rating">
           <h3>
             Đánh giá trung bình:{" "}
-            {movie.rating ? parseFloat((movie.rating).toFixed(2)) : "Chưa có"}
+            {movie.rating ? parseFloat(movie.rating).toFixed(2) : "Chưa có"}
           </h3>
           <p>({movie.totalRatings || 0} lượt đánh giá)</p>
-        </div>
-        <div className="rating-container">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <button
-              key={star}
-              className={selectedRating === star ? "active" : ""}
-              onClick={() => handleRating(star)}
-            >
-              {star} ⭐
-            </button>
-          ))}
+          <button
+            className="write-review-button"
+            onClick={() => setShowReviewForm(!showReviewForm)}
+          >
+            {showReviewForm ? "Đóng" : "Viết đánh giá"}
+          </button>
         </div>
 
-        {/* <div className="comments-section">
-          <h3>Bình luận</h3>
-          <ul className="comments-list">
-            {comments.length > 0 ? (
-              comments.slice(0, visibleComments).map((comment) => (
-                <li key={comment.id}>
-                  <div className="comment-header">
-                    <strong>{comment.username}</strong>
-                    {comment.userId === user?.uid && (
-                      <button onClick={() => handleDeleteComment(comment.id)}>
-                        Xóa
-                      </button>
-                    )}
-                  </div>
-                  <p>{comment.comment}</p>
-                  <div className="comment-actions">
-                    <span>Chọn cảm xúc:</span>
-                    {["❤️", "😂", "😢", "😡"].map((icon) => (
-                      <button
-                        key={icon}
-                        className={comment.reaction === icon ? "active" : ""}
-                        onClick={() => handleUpdateReaction(comment.id, icon)}
-                      >
-                        {icon}
-                      </button>
-                    ))}
-                  </div>
-                  {comment.reaction && <p>{comment.reaction}</p>}
-                </li>
-              ))
-            ) : (
-              <li>Chưa có bình luận nào.</li>
-            )}
-          </ul>
-          {visibleComments < comments.length && ( // Chỉ hiển thị nút "Xem thêm" nếu còn bình luận chưa hiển thị
-            <button
-              className="load-more-comments"
-              onClick={handleLoadMoreComments}
-            >
-              Xem thêm bình luận
-            </button>
-          )}
-          {user ? (
-            <div className="comment-input">
-              <textarea
-                placeholder="Viết bình luận..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-              ></textarea>
-              <button onClick={handleAddComment}>Gửi bình luận</button>
+        {showReviewForm && (
+          <div className="review-section">
+            {/* Form đánh giá */}
+            <div className="review-form">
+              <h3>Viết đánh giá của bạn</h3>
+              <div className="review-input">
+                <textarea
+                  placeholder="Nhập nội dung đánh giá của bạn..."
+                  value={reviewContent}
+                  onChange={(e) => setReviewContent(e.target.value)}
+                ></textarea>
+              </div>
+              <div className="rating-container">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    className={`rating-button ${
+                      selectedRating >= star ? "active" : ""
+                    }`}
+                    onClick={() => setSelectedRating(star)}
+                  >
+                    {star} ⭐
+                  </button>
+                ))}
+              </div>
+              <button
+                className="submit-review-button"
+                onClick={() => handleRating(selectedRating, reviewContent)}
+              >
+                Đăng bài đánh giá
+              </button>
             </div>
-          ) : (
-            <p>
-              Vui lòng{" "}
-              <Link to="/login" state={{ from: location }}>
-                đăng nhập
-              </Link>{" "}
-              để bình luận.
-            </p>
-          )}
-        </div> */}
-        <CommentsSection movieId={movieId} user={user}/>
+
+            {/* Danh sách đánh giá */}
+            <div className="reviews-list">
+              <h3>Đánh giá của người xem</h3>
+              {reviews.length > 0 ? (
+                reviews.map((review) => (
+                  <div key={review.id} className="review-item">
+                    <div className="review-header">
+                      <strong>{review.userName}</strong>
+                      <span className="rating">{review.rating} ⭐</span>
+                    </div>
+                    <p className="review-content">{review.reviewContent}</p>
+                  </div>
+                ))
+              ) : (
+                <p>Chưa có đánh giá nào.</p>
+              )}
+            </div>
+          </div>
+        )}
+
+        <CommentsSection movieId={movieId} user={user} />
       </div>
     </div>
   );

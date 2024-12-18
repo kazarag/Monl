@@ -18,6 +18,7 @@ const MovieManagement = () => {
   const [showEpisode, setShowEpisode] = useState(false);
   const [movies, setMovies] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [currentCategoryId, setCurrentCategoryId] = useState(null);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
@@ -150,11 +151,17 @@ const MovieManagement = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const selectedCategoryObjects = selectedCategories.map((categoryId) => {
-      const category = categories.find((cat) => cat.id === categoryId);
-      return { id: category.id, name: category.name, slug: category.slug };
-    });
+
     try {
+      const selectedCategoryObjects = selectedCategories.map((categorySlug) => {
+        const category = categories.find((cat) => cat.slug === categorySlug);
+        if (!category) {
+          throw new Error(`Thể loại với slug "${categorySlug}" không tồn tại.`);
+        }
+        return { id: category.id, name: category.name, slug: category.slug };
+      });
+      const currentDate = new Date().toISOString(); // Ngày hiện tại ở dạng ISO
+
       if (editMode) {
         await updateDoc(doc(db, "movies", currentMovieId), {
           name: form.name,
@@ -172,6 +179,7 @@ const MovieManagement = () => {
           totalRatings: totalRatings,
           sumRatings: sumRatings,
           rating: rating,
+          day_modified: currentDate, // Thêm ngày chỉnh sửa
         });
         alert("Phim đã được cập nhật thành công!");
       } else {
@@ -191,10 +199,13 @@ const MovieManagement = () => {
           totalRatings: 0,
           sumRatings: 0,
           rating: 0,
+          day_added: currentDate, // Thêm ngày tạo mới
+          day_modified: currentDate, // Lần chỉnh sửa đầu tiên cũng là ngày tạo
         });
         alert("Phim mới đã được thêm thành công!");
       }
 
+      // Reset lại form sau khi xử lý
       setForm({
         name: "",
         content: "",
@@ -215,6 +226,8 @@ const MovieManagement = () => {
       settotalRatings(null);
       setSelectedCategories([]);
       setShowMovieForm(false);
+
+      // Tải lại danh sách phim
       const movieSnapshot = await getDocs(collection(db, "movies"));
       const moviesList = movieSnapshot.docs.map((doc) => ({
         id: doc.id,
@@ -246,6 +259,10 @@ const MovieManagement = () => {
         const data = await response.json();
 
         if (data && data.movie) {
+          const createdTime =
+            data.movie.created?.time || new Date().toISOString(); // Lấy ngày tạo hoặc mặc định hiện tại
+          const modifiedTime = data.movie.modified?.time || createdTime; // Lấy ngày sửa hoặc mặc định là ngày tạo
+
           const newMovie = {
             api: url,
             name: data.movie.name || "Tên phim chưa được cung cấp",
@@ -265,6 +282,8 @@ const MovieManagement = () => {
             totalRatings: 0,
             sumRatings: 0,
             rating: 0,
+            day_added: createdTime,
+            day_modified: modifiedTime,
           };
 
           // Kiểm tra xem phim đã được thêm vào Firestore chưa
@@ -273,8 +292,7 @@ const MovieManagement = () => {
           const querySnapshot = await getDocs(q);
 
           if (!querySnapshot.empty) {
-            // alert(`Phim "${newMovie.name}" đã tồn tại trong cơ sở dữ liệu.`);
-            continue;
+            continue; // Bỏ qua nếu phim đã tồn tại
           }
 
           // Tiến hành thêm phim mới
@@ -351,7 +369,16 @@ const MovieManagement = () => {
       alert(`Có lỗi xảy ra khi cập nhật tập phim: ${error.message}`);
     }
   };
-
+  const handleDeleteEpisode = (indexToRemove) => {
+    if (window.confirm("Bạn có chắc muốn xóa tập này không?")) {
+      setForm((prevForm) => ({
+        ...prevForm,
+        episodes: prevForm.episodes.filter((_, index) => index !== indexToRemove),
+      }));
+    }
+  };
+  
+  
   const handleRefesh = () => {
     setForm({
       name: "",
@@ -507,6 +534,21 @@ const MovieManagement = () => {
                       }
                       required
                     />
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteEpisode(index)}
+                      style={{
+                        marginLeft: "10px",
+                        backgroundColor: "#ff4d4d",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        padding: "5px 10px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Xóa
+                    </button>
                   </div>
                 ))}
               </div>
@@ -525,7 +567,7 @@ const MovieManagement = () => {
           </form>
         )}
 
-        <input
+        {/* <input
           type="text"
           placeholder="Nhập URL API"
           value={apiUrl}
@@ -533,7 +575,7 @@ const MovieManagement = () => {
         />
         <button onClick={handleAddFromApi}>Thêm từ API</button>
         <button onClick={handleUpdateEpisodes}>Cập nhật tất cả tập phim</button>
-        <button onClick={() => navigate("/admin")}>Trở về</button>
+        <button onClick={() => navigate("/admin")}>Trở về</button> */}
 
         <input
           type="text"
@@ -548,6 +590,8 @@ const MovieManagement = () => {
                 <th>Tên phim</th>
                 <th>Thể loại</th>
                 <th>Năm</th>
+                <th>Ngày thêm</th>
+                <th>Ngày chỉnh sửa</th>
                 <th>Thao tác</th>
               </tr>
             </thead>
@@ -557,6 +601,8 @@ const MovieManagement = () => {
                   <td>{movie.name}</td>
                   <td>{movie.category.map((cat) => cat.name).join(", ")}</td>
                   <td>{movie.year}</td>
+                  <td>{new Date(movie.day_added).toLocaleDateString()}</td>
+                  <td>{new Date(movie.day_modified).toLocaleDateString()}</td>
                   <td>
                     <button onClick={() => handleEdit(movie)}>Chỉnh sửa</button>
                     <button onClick={() => handleDelete(movie.id)}>Xóa</button>

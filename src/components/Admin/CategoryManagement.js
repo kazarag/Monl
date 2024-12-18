@@ -48,15 +48,14 @@ const CategoryManagement = () => {
   };
   const handleDeleteCategory = async (categoryId) => {
     try {
-      // Delete category from Firestore
+      
       await deleteDoc(doc(db, "categories", categoryId));
 
-      // Update state to remove the deleted category
       setCategories((prevCategories) =>
         prevCategories.filter((category) => category.id !== categoryId)
       );
 
-      // Update all movies to remove the deleted category
+      
       const movieSnapshot = await getDocs(collection(db, "movies"));
       const updateMoviesPromises = movieSnapshot.docs.map(async (movieDoc) => {
         const movieData = movieDoc.data();
@@ -184,6 +183,7 @@ const CategoryManagement = () => {
           <table className="category-table">
             <thead>
               <tr>
+              <th>ID</th>
                 <th>Tên</th>
                 <th>Slug</th>
                 <th>Thao tác</th>
@@ -192,6 +192,7 @@ const CategoryManagement = () => {
             <tbody>
               {categories.map((category) => (
                 <tr key={category.id}>
+                  <td>{category.id}</td>
                   <td>{category.name}</td>
                   <td>{category.slug}</td>
                   <td>

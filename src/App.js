@@ -16,6 +16,7 @@ import MovieManagement from "./components/Admin/MovieManagement";
 import UserManagement from "./components/Admin/UserManagement";
 import CategoryManagement from "./components/Admin/CategoryManagement";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import CommentManagement from "./components/Admin/CommentManagement";
 
 function App() {
   const { user, loading } = useContext(AuthContext);
@@ -37,6 +38,7 @@ function App() {
           <Route path="/admin" element={user ? <AdminPage /> : <Navigate to="/login" />} />
           <Route path="/admin/movies" element={<MovieManagement />} />
           <Route path="/admin/users" element={<UserManagement />} />
+          <Route path="/admin/comment" element={<CommentManagement/>}/>
           <Route path="/admin/category" element={<CategoryManagement/>}/>
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="*" element={<NotFoundPage />} />
