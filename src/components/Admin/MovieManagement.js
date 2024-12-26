@@ -71,6 +71,13 @@ const MovieManagement = () => {
   }, []);
 
   const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      "Bạn có chắc chắn muốn xóa phim này? Hành động này không thể hoàn tác."
+    );
+
+    if (!confirmDelete) {
+      return; // Người dùng chọn "Hủy"
+    }
     try {
       await deleteDoc(doc(db, "movies", id));
       setMovies(movies.filter((movie) => movie.id !== id));
@@ -160,7 +167,7 @@ const MovieManagement = () => {
         }
         return { id: category.id, name: category.name, slug: category.slug };
       });
-      const currentDate = new Date().toISOString(); // Ngày hiện tại ở dạng ISO
+      const currentDate = new Date().toISOString(); 
 
       if (editMode) {
         await updateDoc(doc(db, "movies", currentMovieId), {
@@ -199,8 +206,8 @@ const MovieManagement = () => {
           totalRatings: 0,
           sumRatings: 0,
           rating: 0,
-          day_added: currentDate, // Thêm ngày tạo mới
-          day_modified: currentDate, // Lần chỉnh sửa đầu tiên cũng là ngày tạo
+          day_added: currentDate, 
+          day_modified: currentDate, 
         });
         alert("Phim mới đã được thêm thành công!");
       }
@@ -241,8 +248,10 @@ const MovieManagement = () => {
   };
 
   const filteredMovies = movies.filter((movie) =>
-    movie.name.toLowerCase().includes(searchQuery.toLowerCase())
+    movie.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    movie.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  
 
   const handleAddFromApi = async () => {
     if (!apiUrl) {
@@ -260,8 +269,8 @@ const MovieManagement = () => {
 
         if (data && data.movie) {
           const createdTime =
-            data.movie.created?.time || new Date().toISOString(); // Lấy ngày tạo hoặc mặc định hiện tại
-          const modifiedTime = data.movie.modified?.time || createdTime; // Lấy ngày sửa hoặc mặc định là ngày tạo
+            data.movie.created?.time || new Date().toISOString(); 
+          const modifiedTime = data.movie.modified?.time || createdTime; 
 
           const newMovie = {
             api: url,
@@ -334,7 +343,6 @@ const MovieManagement = () => {
     setMovies(moviesList);
   };
 
-  // Hàm tự động cập nhật thêm tập mới cho tất cả phim
   const handleUpdateEpisodes = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "movies"));
@@ -344,41 +352,51 @@ const MovieManagement = () => {
       }));
 
       for (const movie of movies) {
-        const apiUrl = movie.api; // Giả sử mỗi phim có một API URL duy nhất
-        const response = await fetch(apiUrl);
-        const data = await response.json();
+        // Kiểm tra nếu có api và số tập chưa hoàn thành
+        if (movie.api && movie.episode_current < movie.episode_total)
+          {
+          const apiUrl = movie.api;
+          const response = await fetch(apiUrl);
+          const data = await response.json();
+          const currentDate = new Date().toISOString();
+          if (data && data.movie) {
+            const updatedEpisodes = data.episodes[0].server_data.map((ep) => ({
+              name: ep.name,
+              link_m3u8: ep.link_embed,
+            }));
 
-        if (data && data.movie) {
-          const updatedEpisodes = data.episodes[0].server_data.map((ep) => ({
-            name: ep.name,
-            link_m3u8: ep.link_embed,
-          }));
-
-          // Cập nhật thông tin mới
-          await updateDoc(doc(db, "movies", movie.id), {
-            episode_current: data.movie.episode_current,
-            episode_total: data.movie.episode_total,
-            episodes: updatedEpisodes,
-          });
+            // Cập nhật thông tin mới
+            await updateDoc(doc(db, "movies", movie.id), {
+              episode_current: data.movie.episode_current,
+              episode_total: data.movie.episode_total,
+              episodes: updatedEpisodes,
+              day_modified: currentDate,
+            });
+            console.log(
+              `Đã cập nhật phim: ${movie.name}, Tập: ${data.movie.episode_current}/${data.movie.episode_total}`
+            );
+          }
         }
       }
 
-      alert("Đã cập nhật tất cả tập phim thành công!");
+      alert("Đã cập nhật tất cả tập phim chưa hoàn thành thành công!");
     } catch (error) {
       console.error("Lỗi khi cập nhật tập phim:", error);
       alert(`Có lỗi xảy ra khi cập nhật tập phim: ${error.message}`);
     }
   };
+
   const handleDeleteEpisode = (indexToRemove) => {
     if (window.confirm("Bạn có chắc muốn xóa tập này không?")) {
       setForm((prevForm) => ({
         ...prevForm,
-        episodes: prevForm.episodes.filter((_, index) => index !== indexToRemove),
+        episodes: prevForm.episodes.filter(
+          (_, index) => index !== indexToRemove
+        ),
       }));
     }
   };
-  
-  
+
   const handleRefesh = () => {
     setForm({
       name: "",
@@ -572,10 +590,10 @@ const MovieManagement = () => {
           placeholder="Nhập URL API"
           value={apiUrl}
           onChange={(e) => setApiUrl(e.target.value)}
-        />
-        <button onClick={handleAddFromApi}>Thêm từ API</button>
-        <button onClick={handleUpdateEpisodes}>Cập nhật tất cả tập phim</button>
-        <button onClick={() => navigate("/admin")}>Trở về</button> */}
+        /> */}
+        {/* <button onClick={handleAddFromApi}>Thêm từ API</button> */}
+        {/* <button onClick={handleUpdateEpisodes}>Cập nhật tất cả tập phim</button> */}
+        {/* <button onClick={() => navigate("/admin")}>Trở về</button> */}
 
         <input
           type="text"
@@ -590,7 +608,7 @@ const MovieManagement = () => {
                 <th>Tên phim</th>
                 <th>Thể loại</th>
                 <th>Năm</th>
-                <th>Ngày thêm</th>
+                {/* <th>Ngày thêm</th> */}
                 <th>Ngày chỉnh sửa</th>
                 <th>Thao tác</th>
               </tr>
@@ -601,7 +619,7 @@ const MovieManagement = () => {
                   <td>{movie.name}</td>
                   <td>{movie.category.map((cat) => cat.name).join(", ")}</td>
                   <td>{movie.year}</td>
-                  <td>{new Date(movie.day_added).toLocaleDateString()}</td>
+                  {/* <td>{new Date(movie.day_added).toLocaleDateString()}</td> */}
                   <td>{new Date(movie.day_modified).toLocaleDateString()}</td>
                   <td>
                     <button onClick={() => handleEdit(movie)}>Chỉnh sửa</button>

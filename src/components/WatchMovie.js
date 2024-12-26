@@ -195,12 +195,12 @@ const WatchMovie = () => {
       const ratingsRef = collection(db, "ratings");
       const movieDocRef = doc(db, "movies", movieId);
 
-      const q = query(
+      let q = query(
         ratingsRef,
         where("userId", "==", user.uid),
         where("movieId", "==", movieId)
       );
-      const querySnapshot = await getDocs(q);
+      let querySnapshot = await getDocs(q);
 
       const movieDoc = await getDoc(movieDocRef);
       if (!movieDoc.exists()) {
@@ -260,9 +260,36 @@ const WatchMovie = () => {
       if (updatedMovieDoc.exists) {
         setMovie(updatedMovieDoc.data());
       }
-
-      setReviewContent("");
-      setSelectedRating(0);
+      const usersRef = collection(db, "user");
+      q = query(ratingsRef, where("movieId", "==", movieId));
+        querySnapshot = await getDocs(q);
+  
+        const reviewsData = await Promise.all(
+          querySnapshot.docs.map(async (reviewDoc) => {
+            const review = reviewDoc.data();
+            try {
+              const userDocRef = doc(usersRef, review.userId);
+              const userDoc = await getDoc(userDocRef);
+              const userName = userDoc.exists()
+                ? userDoc.data().fullname
+                : "Người dùng ẩn danh";
+  
+              return {
+                id: reviewDoc.id,
+                ...review,
+                userName,
+              };
+            } catch (error) {
+              console.error(`Lỗi khi lấy tên người dùng: ${error.message}`);
+              return {
+                id: reviewDoc.id,
+                ...review,
+                userName: "Người dùng ẩn danh",
+              };
+            }
+          })
+        );
+        setReviews(reviewsData);
     } catch (error) {
       console.error("Lỗi khi xử lý đánh giá:", error);
     }

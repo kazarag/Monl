@@ -98,7 +98,7 @@ const MovieDetail = () => {
           <p>Chất lượng: {movie.quality}</p>
           <p>Ngôn ngữ: {movie.lang}</p>
           {movie.rating && movie.rating>0?(
-          <p>Đánh giá: {(movie.rating)}⭐ </p>):(
+          <p>Đánh giá: {movie.rating ? parseFloat(movie.rating).toFixed(2) : "Chưa có"}⭐ </p>):(
             <p>Đánh giá: Chưa có đánh giá</p>
           )}
           <button onClick={handleWatchMovie} className="watch-movie-button">Xem phim</button>

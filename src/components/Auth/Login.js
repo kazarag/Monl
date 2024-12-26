@@ -49,11 +49,11 @@ const Login = () => {
 
 
       const from = location.state?.from?.pathname;
-      // alert(from);
-      if (role == "admin" && from == null) {
+
+      if (role == "admin") {
         navigate("/admin");
       } else {
-        if (from == null) {
+        if (from == null ) {
           navigate("/");
         } else {
           navigate(from);

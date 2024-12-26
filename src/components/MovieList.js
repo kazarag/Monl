@@ -170,7 +170,7 @@ const MovieList = () => {
   return (
     <div className="movie-list">
       {/* Recommended Movies */}
-      {recommendedMovies && recommendedMovies.length > 0 ? (
+      {recommendedMovies && user && recommendedMovies.length > 0 ? (
         <div className="recommended-movies">
           <h3>Gợi ý cho bạn</h3>
           <div className="slider-container">
